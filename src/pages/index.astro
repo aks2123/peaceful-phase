@@ -1,16 +1,217 @@
 ---
 ---
 
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4f0">
+  <title>Fieldnotes — A visual journal</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f5f4f0;
+      --ink: #20231f;
+      --muted: #777b73;
+      --line: rgba(32, 35, 31, .12);
+      --accent: #b8d65a;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    .page { width: min(1180px, calc(100% - 64px)); margin: 0 auto; }
+    .topbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+    .brand-mark { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); font-size: 14px; letter-spacing: 0; }
+    .top-note { color: var(--muted); font-size: 12px; letter-spacing: .04em; }
+    .intro { padding: clamp(54px, 9vw, 104px) 0 30px; }
+    .eyebrow, .section-kicker { margin: 0 0 16px; color: var(--muted); font-size: 11px; font-weight: 650; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { max-width: 800px; margin: 0; font-family: var(--serif); font-size: clamp(58px, 10vw, 118px); font-weight: 400; letter-spacing: -.065em; line-height: .88; }
+    .intro-row { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-top: 30px; }
+    .intro-copy { max-width: 430px; margin: 0; color: #62665e; font-size: 16px; line-height: 1.7; }
+    .issue { color: var(--muted); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+    .hero { position: relative; min-height: clamp(330px, 55vw, 610px); overflow: hidden; border-radius: 5px; background: #c5c9bb; }
+    .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .hero::after { position: absolute; inset: 35% 0 0; content: ""; background: linear-gradient(transparent, rgba(13, 19, 14, .55)); pointer-events: none; }
+    .hero-caption { position: absolute; z-index: 1; right: clamp(22px, 5vw, 56px); bottom: clamp(24px, 5vw, 54px); left: clamp(22px, 5vw, 56px); display: flex; align-items: end; justify-content: space-between; gap: 24px; color: white; }
+    .hero-caption h2 { max-width: 590px; margin: 0; font-family: var(--serif); font-size: clamp(31px, 5vw, 58px); font-weight: 400; letter-spacing: -.035em; line-height: 1.02; }
+    .hero-caption p { margin: 0 0 5px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; }
+    .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 90px 0 96px; }
+    .text-card { min-height: 270px; padding: clamp(26px, 4vw, 42px); border: 1px solid rgba(32, 35, 31, .06); border-radius: 16px; background: #fff; box-shadow: 0 10px 30px rgba(32, 35, 31, .07), 0 2px 6px rgba(32, 35, 31, .035); display: flex; flex-direction: column; justify-content: space-between; transition: transform .25s ease, box-shadow .25s ease; }
+    .text-card.featured { background: #e8e9e1; border-color: rgba(32, 35, 31, .04); box-shadow: 0 12px 34px rgba(32, 35, 31, .09), 0 2px 7px rgba(32, 35, 31, .04); }
+    .text-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(32, 35, 31, .11), 0 4px 10px rgba(32, 35, 31, .045); }
+    .text-card h2 { max-width: 440px; margin: 0 0 18px; font-family: var(--serif); font-size: clamp(29px, 4vw, 43px); font-weight: 400; letter-spacing: -.035em; line-height: 1.08; }
+    .text-card p { max-width: 460px; margin: 0; color: #62665e; font-size: 14px; line-height: 1.8; }
+    .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 30px; color: var(--muted); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+    .arrow { color: var(--ink); font-size: 20px; }
+    .gallery { padding: 0 0 104px; }
+    .gallery-head { display: flex; align-items: end; justify-content: space-between; gap: 22px; margin-bottom: 24px; }
+    .gallery-head h2 { margin: 0; font-family: var(--serif); font-size: clamp(39px, 6vw, 66px); font-weight: 400; letter-spacing: -.05em; line-height: .95; }
+    .gallery-head .section-kicker { margin-bottom: 12px; }
+    .controls { display: flex; gap: 8px; }
+    .control { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--ink); font-size: 19px; cursor: pointer; transition: background .2s, border-color .2s, transform .2s; }
+    .control:hover { transform: translateY(-2px); border-color: var(--ink); background: white; }
+    .control:focus-visible, .dot:focus-visible { outline: 2px solid #637c20; outline-offset: 3px; }
+    .carousel-window { overflow: hidden; }
+    .carousel-track { display: flex; gap: 18px; transition: transform .55s cubic-bezier(.2,.75,.25,1); will-change: transform; }
+    .slide { flex: 0 0 calc((100% - 36px) / 3); min-width: 0; }
+    .slide img { display: block; width: 100%; aspect-ratio: 4 / 4.7; object-fit: cover; border-radius: 3px; background: #ddd; }
+    .slide-meta { display: flex; justify-content: space-between; gap: 12px; padding-top: 13px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+    .slide-meta strong { color: var(--ink); font-weight: 600; }
+    .carousel-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 26px; }
+    .dots { display: flex; gap: 8px; }
+    .dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%; background: #c8c9c2; cursor: pointer; }
+    .dot[aria-current="true"] { background: var(--ink); }
+    .count { color: var(--muted); font-size: 11px; letter-spacing: .1em; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 22px 0 30px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    @media (max-width: 720px) {
+      .page { width: min(100% - 36px, 600px); }
+      .topbar { min-height: 64px; }
+      .top-note { font-size: 10px; }
+      .intro { padding-top: 62px; }
+      .intro-row { align-items: start; flex-direction: column; gap: 15px; }
+      .hero-caption { align-items: start; flex-direction: column; gap: 12px; }
+      .hero-caption p { order: -1; }
+      .content-grid { grid-template-columns: 1fr; padding: 58px 0 70px; }
+      .text-card { min-height: 235px; }
+      .slide { flex-basis: 78%; }
+      .gallery { padding-bottom: 76px; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="page topbar">
+    <a class="brand" href="#top" aria-label="Fieldnotes home"><span class="brand-mark">✳</span> Fieldnotes</a>
+    <span class="top-note">A visual journal · Issue 01</span>
+  </header>
+
+  <main id="top" class="page">
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Places, people &amp; little discoveries</p>
+      <h1 id="page-title">A slower<br>kind of looking.</h1>
+      <div class="intro-row">
+        <p class="intro-copy">A collection of moments gathered along the way. Notes on the landscapes we pass through and the details that ask us to stay.</p>
+        <span class="issue">Stories from the open road&nbsp; ↘</span>
+      </div>
+    </section>
+
+    <!-- Hero image: replace the src and update the caption to feature your own story. -->
+    <section class="hero" aria-labelledby="hero-title">
+      <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&amp;fit=crop&amp;w=2000&amp;q=85" alt="A quiet alpine lake reflecting the surrounding mountains" fetchpriority="high">
+      <div class="hero-caption">
+        <h2 id="hero-title">Where the mountains<br>meet the morning.</h2>
+        <p>Dolomites, Italy&nbsp; · &nbsp;06:18 AM</p>
+      </div>
+    </section>
+
+    <!-- Reusable text boxes: duplicate a .text-card to add another content block. -->
+    <section class="content-grid" aria-label="Journal notes">
+      <article class="text-card featured">
+        <div>
+          <p class="section-kicker">01 / The feeling</p>
+          <h2>Leave room for the unexpected.</h2>
+          <p>The best parts of a journey rarely arrive on schedule. A wrong turn, a late train, a path that looks too small on the map — these are often the moments that stay with us.</p>
+        </div>
+        <div class="card-foot"><span>Notes from the road</span><span class="arrow" aria-hidden="true">↗</span></div>
+      </article>
+      <article class="text-card">
+        <div>
+          <p class="section-kicker">02 / The practice</p>
+          <h2>Pay attention to what’s already here.</h2>
+          <p>Light moving across a wall. The warmth of a cup held between both hands. The landscape changes when we give it our full attention.</p>
+        </div>
+        <div class="card-foot"><span>A small reminder</span><span class="arrow" aria-hidden="true">↗</span></div>
+      </article>
+    </section>
+
+    <!-- Carousel: images, alt text and captions can all be replaced independently. -->
+    <section class="gallery" aria-labelledby="gallery-title">
+      <div class="gallery-head">
+        <div>
+          <p class="section-kicker">Collected along the way</p>
+          <h2 id="gallery-title">A few frames.</h2>
+        </div>
+        <div class="controls" aria-label="Carousel controls">
+          <button class="control" type="button" data-direction="-1" aria-label="Previous images">←</button>
+          <button class="control" type="button" data-direction="1" aria-label="Next images">→</button>
+        </div>
+      </div>
+      <div class="carousel-window" aria-roledescription="carousel" aria-label="Travel photographs">
+        <div class="carousel-track" id="carousel-track">
+          <article class="slide"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Sunlit mountain valley beneath a wide sky" loading="lazy"><div class="slide-meta"><strong>High country</strong><span>01 / 05</span></div></article>
+          <article class="slide"><img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Golden light spilling over a misty field" loading="lazy"><div class="slide-meta"><strong>First light</strong><span>02 / 05</span></div></article>
+          <article class="slide"><img src="https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Deer standing in a quiet woodland" loading="lazy"><div class="slide-meta"><strong>Quiet company</strong><span>03 / 05</span></div></article>
+          <article class="slide"><img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="A path winding through a green forest" loading="lazy"><div class="slide-meta"><strong>Green passage</strong><span>04 / 05</span></div></article>
+          <article class="slide"><img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="A winding road through a dramatic landscape" loading="lazy"><div class="slide-meta"><strong>The long way</strong><span>05 / 05</span></div></article>
+        </div>
+      </div>
+      <div class="carousel-bottom">
+        <div class="dots" aria-label="Choose image group"></div>
+        <span class="count" aria-live="polite">01 — 03</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page"><span>Fieldnotes — A visual journal</span><span>Made for the moments in between.</span></footer>
+
+  <script>
+    (() => {
+      const track = document.querySelector('#carousel-track');
+      const slides = Array.from(track.children);
+      const dotsContainer = document.querySelector('.dots');
+      const count = document.querySelector('.count');
+      const buttons = document.querySelectorAll('.control');
+      let index = 0;
+
+      // Show three slides on wide screens and one on narrow screens.
+      const visibleSlides = () => window.matchMedia('(max-width: 720px)').matches ? 1 : 3;
+      const lastIndex = () => Math.max(0, slides.length - visibleSlides());
+      const gap = () => parseFloat(getComputedStyle(track).gap) || 0;
+
+      function render() {
+        index = Math.min(index, lastIndex());
+        const slideWidth = slides[0].getBoundingClientRect().width;
+        track.style.transform = `translateX(-${index * (slideWidth + gap())}px)`;
+        count.textContent = `${String(index + 1).padStart(2, '0')} — ${String(Math.min(index + visibleSlides(), slides.length)).padStart(2, '0')}`;
+        dotsContainer.querySelectorAll('.dot').forEach((dot, dotIndex) => {
+          dot.setAttribute('aria-current', String(dotIndex === index));
+        });
+        buttons.forEach(button => {
+          button.disabled = index === 0 && button.dataset.direction === '-1' || index === lastIndex() && button.dataset.direction === '1';
+          button.style.opacity = button.disabled ? '.4' : '1';
+          button.style.cursor = button.disabled ? 'default' : 'pointer';
+        });
+      }
+
+      function buildDots() {
+        dotsContainer.replaceChildren();
+        for (let dotIndex = 0; dotIndex <= lastIndex(); dotIndex++) {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'dot';
+          dot.setAttribute('aria-label', `Show image group ${dotIndex + 1}`);
+          dot.addEventListener('click', () => { index = dotIndex; render(); });
+          dotsContainer.append(dot);
+        }
+        render();
+      }
+
+      buttons.forEach(button => button.addEventListener('click', () => {
+        index = Math.max(0, Math.min(lastIndex(), index + Number(button.dataset.direction)));
+        render();
+      }));
+      window.addEventListener('resize', buildDots);
+      buildDots();
+    })();
+  </script>
+</body>
 </html>
+
